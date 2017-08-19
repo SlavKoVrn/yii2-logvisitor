@@ -17,7 +17,7 @@
     "require": {
         "yiisoft/yii2": "~2.0",
         "yiisoft/yii2-jui": "~2.0",
-        "yiisoft/visualize": "*"
+        "slavkovrn/yii2-visualize": "*"
     },
     "minimum-stability" : "dev",
     "autoload": {
