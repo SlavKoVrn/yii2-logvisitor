@@ -1,0 +1,28 @@
+{
+    "name": "slavkovrn/yii2-logvisitor",
+    "description": "The Yii2 extension to log site requests and draw charts of these requests progress by calendar dates.",
+    "type": "yii2-extension",
+    "keywords": ["Yii2","extension","log","requests","draw","charts"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Viacheslav Kolesnikov",
+            "email": "slavko.chita@gmail.com",
+            "homepage": "http://yii2.kadastrcard.ru"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/SlavKoVrn/yii2-logvisitor.git"
+    },
+    "require": {
+        "yiisoft/yii2": "~2.0",
+        "yiisoft/yii2-jui": "~2.0",
+        "yiisoft/visualize": "*"
+    },
+    "minimum-stability" : "dev",
+    "autoload": {
+        "psr-4": {
+            "slavkovrn\\logvisitor\\": "src/"
+        }
+    }
+}
