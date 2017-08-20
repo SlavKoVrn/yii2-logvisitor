@@ -39,6 +39,9 @@ class DefaultController extends Controller
     function filterIp($ip_uri,$filterIp)
     {
         $arrFilterIp=explode(',',$filterIp);
+        foreach ($arrFilterIp as $key=>$val)
+            if (empty($val))
+                unset($arrFilterIp[$key]);
         $out=[];
         foreach ($ip_uri as $_ip_uri)
         {
@@ -58,6 +61,9 @@ class DefaultController extends Controller
     function filterUri($ip_uri,$filterUri)
     {
         $arrFilterUri=explode(',',$filterUri);
+        foreach ($arrFilterUri as $key=>$val)
+            if (empty($val))
+                unset($arrFilterUri[$key]);
         $out=[];
         foreach ($ip_uri as $_ip_uri)
         {
@@ -65,7 +71,11 @@ class DefaultController extends Controller
             foreach ($arrFilterUri as $f_uri)
             {
                 $f_uri=trim($f_uri);
-                if (strpos($_ip_uri['uri'],$f_uri)!==false)
+                if ($f_uri==='/'){
+                    if ($_ip_uri['uri']===$f_uri)
+                        $good = false;
+                }
+                elseif (strpos($_ip_uri['uri'],$f_uri)!==false)
                     $good = false;
             }
             if ($good)
