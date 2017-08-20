@@ -12,12 +12,76 @@ use slavkovrn\logvisitor\models\LogVisitorForm;
  */
 class DefaultController extends Controller
 {
+    public $graphic_id = 'graphic';
+    public $graphic_width = 1000;
+    public $graphic_height = 200;
+
+    public function actionChart()
+    {
+        $ip=Yii::$app->request->post('ip');
+        $uri=Yii::$app->request->post('uri');
+        $dateFrom=Yii::$app->request->post('dateFrom');
+        $dateFrom_year=substr($dateFrom,0,4);
+        $dateFrom_month=substr($dateFrom,5,2);
+        $dateFrom_day=substr($dateFrom,8,2);
+
+        $dateTo=Yii::$app->request->post('dateTo');
+        $dateTo_year=substr($dateTo,0,4);
+        $dateTo_month=substr($dateTo,5,2);
+        $dateTo_day=substr($dateTo,8,2);
+
+        $timeFrom = strtotime(date($dateFrom_year.'-'.$dateFrom_month.'-'.$dateFrom_day.' 00:00:00'));
+        $timeTo = strtotime(date($dateTo_year.'-'.$dateTo_month.'-'.$dateTo_day.' 23:59:59'));
+
+        $ip_uri = (new \yii\db\Query())
+            ->select(['time','ip','uri'])
+            ->from('{{%logvisitor}}')
+            ->where('time>'.$timeFrom)
+            ->andWhere('time<='.$timeTo)
+            ->andWhere('ip="'.$ip.'"')
+            ->andWhere('uri="'.$uri.'"')
+            ->all();
+
+        if (!empty($filterIp))
+            $ip_uri = $this->filterIp($ip_uri,$filterIp);
+        if (!empty($filterUri))
+            $ip_uri = $this->filterUri($ip_uri,$filterUri);
+
+        $delta=($timeTo-$timeFrom)/20;
+        $current=$timeFrom;
+        $x[$current]=0;
+        while ($current < $timeTo)
+        {
+            $current+=$delta;
+            $x[$current]=0;
+        }
+        $current=$timeFrom;
+        while ($current < $timeTo)
+        {
+            $current+=$delta;
+            foreach ($ip_uri as $ipuri)
+            {
+                if ($ipuri['time']>($current-$delta) and $ipuri['time']<=$current)
+                    $x[$current]++;
+            }
+        }
+        foreach ($x as $key=>$val)
+        {
+            $xx[date('H:i',$key)]=$val;
+        }
+
+        $graphic_id=$this->graphic_id;
+        $graphic_width=$this->graphic_width;
+        $graphic_height=$this->graphic_height;
+        $graphic_chart=[
+            $ip.' '.$uri => $xx,
+        ];
+        return $this->renderPartial('_widget',compact('graphic_id','graphic_width','graphic_height','graphic_chart'));
+    }
+
     public function actionWhois()
     {
-        $id=Yii::$app->request->post('id');
-        $model=LogVisitorModel::findOne($id);
-        $ip=$model->ip;
-
+        $ip=Yii::$app->request->post('ip');
         $whois_server = "whois.ripe.net";
         
         $ch = curl_init();
@@ -103,18 +167,61 @@ class DefaultController extends Controller
         }
 
         $ip_uri = (new \yii\db\Query())
-            ->select(['id','ip','uri','count(ip)'])
+            ->select(['time','ip','uri'])
             ->from('{{%logvisitor}}')
-            ->where('time>='.$timeFrom)
+            ->where('time>'.$timeFrom)
             ->andWhere('time<='.$timeTo)
-            ->groupBy(['ip','uri'])
-            ->orderBy('ip,uri')
             ->all();
+
         if (!empty($filterIp))
             $ip_uri = $this->filterIp($ip_uri,$filterIp);
         if (!empty($filterUri))
             $ip_uri = $this->filterUri($ip_uri,$filterUri);
 
-        return $this->render('index',compact('ip_uri','model'));
+        $delta=($timeTo-$timeFrom)/20;
+        $current=$timeFrom;
+        $x[$current]=0;
+        while ($current < $timeTo)
+        {
+            $current+=$delta;
+            $x[$current]=0;
+        }
+        $current=$timeFrom;
+        while ($current < $timeTo)
+        {
+            $current+=$delta;
+            foreach ($ip_uri as $ipuri)
+            {
+                if ($ipuri['time']>($current-$delta) and $ipuri['time']<=$current)
+                    $x[$current]++;
+            }
+        }
+        foreach ($x as $key=>$val)
+        {
+            $xx[date('H:i',$key)]=$val;
+        }
+
+        $graphic_id=$this->graphic_id;
+        $graphic_width=$this->graphic_width;
+        $graphic_height=$this->graphic_height;
+        $graphic_chart=[
+            Yii::t('logvisitor','All') => $xx,
+        ];
+
+        $ip_uri = (new \yii\db\Query())
+            ->select(['time','ip','uri','count(ip)'])
+            ->from('{{%logvisitor}}')
+            ->where('time>'.$timeFrom)
+            ->andWhere('time<='.$timeTo)
+            ->groupBy(['ip','uri'])
+            ->orderBy('ip,uri')
+            ->all();
+
+        if (!empty($filterIp))
+            $ip_uri = $this->filterIp($ip_uri,$filterIp);
+        if (!empty($filterUri))
+            $ip_uri = $this->filterUri($ip_uri,$filterUri);
+
+        return $this->render('index',compact('ip_uri','model','graphic_id','graphic_width','graphic_height','graphic_chart'));
     }
 }

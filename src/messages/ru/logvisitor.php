@@ -9,5 +9,7 @@ return [
     'Comma separated substrings of URI to be filtered' => 
     'Разделенные запятыми подстроки поиска вхождений в URI для исключения из поиска',
     'Show' => 'Показать',
+    'Chart' => 'График',
+    'All' => 'Все',
 ];
 ?>

@@ -14,6 +14,8 @@ Modal::end();
 ?>
 <div class="LogVisitorModule-default-index">
     <div class="content">
+
+
         <div class="row">
             <div class="col-sm-10">
 
@@ -63,15 +65,21 @@ Modal::end();
         </div>
 
         <div class="row">
+            <div id="widget" class="col-sm-12">
+                <?= $this->render('_widget',compact('graphic_id','graphic_width','graphic_height','graphic_chart')) ?>
+            </div>
+        </div>
+
+        <div class="row">
             <div class="col-sm-12">
                 <div class="table-responsive"> 
                 <table class="table table table-striped table-bordered table-hover table-condensed">
-                    <caption><h3>Unique IP,URI,count()</h3></caption>
+                    <caption><h3>UNIQUE IP,URI,count()</h3></caption>
                     <thead>
                         <tr class="success">
                             <th>IP</th>
-                            <th>Uri</th>
-                            <th>Count()</th>
+                            <th>URI</th>
+                            <th>count()</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -81,7 +89,10 @@ Modal::end();
                                 <td><?= $val['ip'] ?></td>
                                 <td><?= $val['uri'] ?></td>
                                 <td><?= $val['count(ip)'] ?></td>
-                                <td><a data-id="<?= $val['id'] ?>" class="btn btn-success whois">Whois IP</button></td>
+                                <td>
+                                    <a data-ip="<?= $val['ip'] ?>" class="btn btn-success whois" style="margin:3px">Whois IP</button></div>
+                                    <a data-ip="<?= $val['ip'] ?>" data-uri="<?= $val['uri'] ?>" class="btn btn-success chart" style="margin:3px;"><?= Yii::t('logvisitor','Chart') ?></button>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -94,16 +105,39 @@ Modal::end();
 <?php
 $this->registerJs("
     $('.whois').click(function(){
-        var id=$(this).data('id');
+        var ip=$(this).data('ip');
 		$.ajax({
 			url:'/logvisitor/default/whois',
 			type: 'post',
             dataType:'json',
-            data:{'id':id},
+            data:{'ip':ip},
 			success: function(data) {
-                console.log(data);
                 $('#ip-popup .modal-body').html(data.info);
-                $('#ip-popup').modal('toggle'); 			}
+                $('#ip-popup').modal('toggle');
+ 			}
+		});
+    });
+    $('.chart').click(function(){
+        var ip=$(this).data('ip');
+        var uri=$(this).data('uri');
+        var dateFrom=$('#logvisitorform-datefrom').val();
+        var dateTo=$('#logvisitorform-dateto').val();
+		$.ajax({
+			url:'/logvisitor/default/chart',
+			type: 'post',
+            data:{
+                'ip':ip,
+                'uri':uri,
+                'dateFrom':dateFrom,
+                'dateTo':dateTo,
+            },
+			success: function(data) {
+                $('#widget').html(data);
+                if ($('#graphic_table_".$graphic_id." > table').length)
+    			    $('#graphic_table_".$graphic_id." > table')
+                        .visualize({type:'line', width:'".$graphic_width."px',height:'".$graphic_height."px'})
+    			        .appendTo('#".$graphic_id."').trigger('visualizeRefresh');
+ 			}
 		});
     });
 ",$this::POS_READY);
