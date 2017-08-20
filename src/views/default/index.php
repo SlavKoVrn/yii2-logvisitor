@@ -32,18 +32,18 @@ Modal::end();
                     ]); 
                     ?>
                     <?= $form->field($model, 'dateFrom')->widget(DatePicker::classname(),[
-                        'language' => Yii::$app->language,
+                        'language' => (isset(Yii::$app->language))?Yii::$app->language:'en',
                         'dateFormat' => 'yyyy-MM-dd'
                     ]) ?>
                     <?= $form->field($model, 'dateTo')->widget(DatePicker::classname(),[
-                        'language' => Yii::$app->language,
+                        'language' => (isset(Yii::$app->language))?Yii::$app->language:'en',
                         'dateFormat' => 'yyyy-MM-dd'
                     ]) ?>
                     <?= $form->field($model, 'filterIp') ?>
                     <div class="form-group">
                         <div class="col-sm-4"></div>
                         <div class="col-sm-8">
-                            <?= Yii::t('logvisitor','Comma separated substrings of IP to be filtered, begining from first position preg_match(/^needle/,haystack)') ?>
+                            <?= Yii::t('logvisitor','Comma separated substrings of IP to be filtered, begining from first position preg_match(/^needle/,haystack), for example 127.0.0.1') ?>
                         </div>
                     </div>
                     <?= $form->field($model, 'filterUri') ?>
