@@ -4,6 +4,7 @@ namespace slavkovrn\logvisitor\controllers;
 
 use Yii;
 use yii\web\Controller;
+use slavkovrn\logvisitor\models\LogVisitorModel;
 use slavkovrn\logvisitor\models\LogVisitorForm;
 
 /**
