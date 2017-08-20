@@ -78,10 +78,10 @@ class DefaultController extends Controller
     {
         $model = new LogVisitorForm();
 
-        $timeFrom=time();
-        $timeTo=$timeFrom;
+        $timeFrom = strtotime(date('Y-m-d 00:00:00'));
+        $timeTo = strtotime(date('Y-m-d 23:59:59'));
         $model->dateFrom = date('Y-m-d',$timeFrom);
-        $model->dateTo = date('Y-m-d',$timeFrom);
+        $model->dateTo = date('Y-m-d',$timeTo);
         $filterIp='';
         $filterUri='';
 
