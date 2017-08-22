@@ -47,7 +47,7 @@ class DefaultController extends Controller
 
         $mode=Yii::$app->request->get('mode');
         if ($mode == 'demo')
-            return $this->render('_widget',compact('model'));
+            return $this->renderAjax('_widget',compact('model'));
         else
             return $this->render('index',compact('model'));
     }
