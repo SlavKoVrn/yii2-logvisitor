@@ -3,8 +3,8 @@ use yii\helpers\Html;
 use yii\bootstrap\Modal;
 use yii\bootstrap\ActiveForm;
 use yii\jui\DatePicker;
-?>
-<?php
+use slavkovrn\logvisitor\LogVisitorAsset;
+$assets = LogVisitorAsset::register($this); 
 Modal::begin([
         'options'=>[
             'id'=>"ip-popup",
@@ -66,7 +66,7 @@ Modal::end();
 
         <div class="row">
             <div id="widget" class="col-sm-12">
-                <?= $this->render('_widget',compact('graphic_id','graphic_width','graphic_height','graphic_chart')) ?>
+                <?= $this->render('_widget',compact('model')) ?>
             </div>
         </div>
 
@@ -84,14 +84,15 @@ Modal::end();
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($ip_uri as $key=>$val) : ?>
+                        <?php foreach ($model->ip_uri as $key=>$val) : ?>
                             <tr>
                                 <td><?= $val['ip'] ?></td>
                                 <td><?= $val['uri'] ?></td>
                                 <td><?= $val['count(ip)'] ?></td>
                                 <td>
-                                    <a data-ip="<?= $val['ip'] ?>" class="btn btn-success whois" style="margin:3px">Whois IP</button></div>
-                                    <a data-ip="<?= $val['ip'] ?>" data-uri="<?= $val['uri'] ?>" class="btn btn-success chart" style="margin:3px;"><?= Yii::t('logvisitor','Chart') ?></button>
+                                    <img id="loader<?= $val['id'] ?>" src="<?= $assets->baseUrl.'/images/loader.gif' ?>" style="display:none" />
+                                    <a data-id="<?= $val['id'] ?>" data-ip="<?= $val['ip'] ?>" class="btn btn-success whois" style="margin:3px">Whois IP</button></div>
+                                    <a data-id="<?= $val['id'] ?>" data-ip="<?= $val['ip'] ?>" data-uri="<?= $val['uri'] ?>" class="btn btn-success chart" style="margin:3px;"><?= Yii::t('logvisitor','Chart') ?></button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -106,12 +107,16 @@ Modal::end();
 $this->registerJs("
     $('.whois').click(function(){
         var ip=$(this).data('ip');
+        var dateTo=$('#logvisitormodel-dateto').val();
+        var id=$(this).data('id');
+        $('#loader'+id).show();        
 		$.ajax({
 			url:'/logvisitor/default/whois',
 			type: 'post',
             dataType:'json',
             data:{'ip':ip},
 			success: function(data) {
+                $('#loader'+id).hide();        
                 $('#ip-popup .modal-body').html(data.info);
                 $('#ip-popup').modal('toggle');
  			}
@@ -120,23 +125,26 @@ $this->registerJs("
     $('.chart').click(function(){
         var ip=$(this).data('ip');
         var uri=$(this).data('uri');
-        var dateFrom=$('#logvisitorform-datefrom').val();
-        var dateTo=$('#logvisitorform-dateto').val();
+        var dateFrom=$('#logvisitormodel-datefrom').val();
+        var dateTo=$('#logvisitormodel-dateto').val();
+        var id=$(this).data('id');
+        $('#loader'+id).show();        
 		$.ajax({
 			url:'/logvisitor/default/chart',
 			type: 'post',
             data:{
-                'ip':ip,
-                'uri':uri,
-                'dateFrom':dateFrom,
-                'dateTo':dateTo,
+                'LogVisitorModel[ip]':ip,
+                'LogVisitorModel[uri]':uri,
+                'LogVisitorModel[dateFrom]':dateFrom,
+                'LogVisitorModel[dateTo]':dateTo,
             },
 			success: function(data) {
+                $('#loader'+id).hide();        
                 $('#widget').html(data);
-                if ($('#graphic_table_".$graphic_id." > table').length)
-    			    $('#graphic_table_".$graphic_id." > table')
-                        .visualize({type:'line', width:'".$graphic_width."px',height:'".$graphic_height."px'})
-    			        .appendTo('#".$graphic_id."').trigger('visualizeRefresh');
+                if ($('#graphic_table_".$model->graphic_id." > table').length)
+    			    $('#graphic_table_".$model->graphic_id." > table')
+                        .visualize({type:'line', width:'".$model->graphic_width."px',height:'".$model->graphic_height."px'})
+    			        .appendTo('#".$model->graphic_id."').trigger('visualizeRefresh');
  			}
 		});
     });

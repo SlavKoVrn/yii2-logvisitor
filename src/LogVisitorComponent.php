@@ -104,7 +104,7 @@ class LogVisitorComponent extends Component
         $model->port = (isset($_SERVER["SERVER_PORT"]))?$_SERVER["SERVER_PORT"]:'';
         $model->browser = (isset($_SERVER["HTTP_USER_AGENT"]))?$_SERVER["HTTP_USER_AGENT"]:'';
         $model->language = (isset($_SERVER["HTTP_ACCEPT_LANGUAGE"]))?$_SERVER["HTTP_ACCEPT_LANGUAGE"]:'';
-        $model->save();
+        $model->save(false);
 	}
 
 	/**

@@ -8,11 +8,11 @@ $this->registerCss("
 ");
 ?>
 <?= VisualizeWidget::widget([
-    'id' => $graphic_id,      // Id of visualize widget should be unique at page
     'class' => 'graphic',   // Class to define stile
-    'name' => Yii::t('logvisitor','Chart'),  // Name of visualize widget
     'style' => 'light',     // Style of widget (only 'dark' or 'light' option)
-    'width' => $graphic_width, // Width of widget in pixels
-    'height' => $graphic_height, // Height of widget in pixels
-    'graphic' => $graphic_chart,
+    'id' => $model->graphic_id,      // Id of visualize widget should be unique at page
+    'name' => $model->graphic_name,  // Name of visualize widget
+    'width' => $model->graphic_width, // Width of widget in pixels
+    'height' => $model->graphic_height, // Height of widget in pixels
+    'graphic' => $model->graphic_chart, // Data of chart
 ]) ?>
