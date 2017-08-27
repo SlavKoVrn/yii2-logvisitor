@@ -36,6 +36,8 @@ return [
     'components' => [
         'logvisitor' => [
             'class' => 'slavkovrn\logvisitor\LogVisitorComponent'
+            'filterIp' => '127.0.0.1,213.87.',  /* comma separated substrings of IP  to be filtered of log in table , begining from first position  */
+            'filterUri' => '/,debug',           /* comma separated substrings of URI to be filtered of log in table */
         ],
     ],
 ];

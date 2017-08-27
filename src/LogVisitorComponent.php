@@ -9,11 +9,13 @@ use slavkovrn\logvisitor\models\LogVisitorModel;
 class LogVisitorComponent extends Component
 {
 	public $table = 'logvisitor';
+	public $filterIp = '';
+	public $filterUri = '';
 
 	public function init()
 	{
 		$this->checkTable();
-		$this->insert();
+        if (!$this->filter()) $this->insert();
 	}
 
 	/**
@@ -87,6 +89,43 @@ class LogVisitorComponent extends Component
     		return $_SERVER['REMOTE_ADDR'];
     	}
     } 
+    protected function filter()
+    {
+        if (!empty($this->filterIp))
+        {
+            $arrFilterIp=explode(',',$this->filterIp);
+            foreach ($arrFilterIp as $key=>$val)
+                if (empty($val))
+                    unset($arrFilterIp[$key]);
+            foreach ($arrFilterIp as $f_ip)
+            {
+                $f_ip=trim($f_ip);
+                if (preg_match('/^'.$f_ip.'/', $this->ip))
+                    return true;
+            }
+        }
+        if (!empty($this->filterUri))
+        {
+            $uri=(isset($_SERVER["REQUEST_URI"]))?$_SERVER["REQUEST_URI"]:'';
+
+            $arrFilterUri=explode(',',$this->filterUri);
+            foreach ($arrFilterUri as $key=>$val)
+                if (empty($val))
+                    unset($arrFilterUri[$key]);
+            foreach ($arrFilterUri as $f_uri)
+            {
+                $f_uri=trim($f_uri);
+                if ($f_uri==='/'){
+                    if ($uri===$f_uri)
+                       return true;
+                }
+                elseif (strpos($uri,$f_uri)!==false)
+                    return true;
+            }
+        }
+        return false;
+    }
+
 	protected function insert()
 	{
         $model = new LogVisitorModel();
